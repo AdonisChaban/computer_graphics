@@ -1,8 +1,15 @@
-LIBS := -lglfw -lGL -lglad
+LIBS := -lglfw -lGL -lglad -lm
 CFLAGS := -Wextra -Wall -I./include
+OBJS := texture_rectangle.o init_image.o
 
 # peak
-all: triangle rectangle
+all: triangle rectangle texture_rectangle
+
+texture_rectangle: $(OBJS) libglad.a
+	gcc $(OBJS) -o texture_rectangle -L. $(LIBS)
+
+$(OBJS): %.o: %.c
+	gcc $(CFLAGS) -c $^ -o $@
 
 rectangle: rectangle.c libglad.a
 	gcc $(CFLAGS) -o rectangle rectangle.c -L. $(LIBS)
