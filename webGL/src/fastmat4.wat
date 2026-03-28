@@ -7,20 +7,21 @@
   (func $transposeMatrix (param $from i32) (param $to i32)
     (local $j i32)
     (local $i i32)
-    (local $top i32)
+    (local $i2 i32)
+	(local $j2 i32)
 
     (loop $outer
 
       i32.const 0
       local.tee $i
-      local.set $top
+      local.set $i2
      
       (loop $inner 
 
-        local.get $top
-        local.get $to
-        i32.add
-        local.get $j
+        local.get $i2
+        local.get $to 
+        i32.add 
+        local.get $j2
         i32.add
         
         local.get $i
@@ -32,10 +33,10 @@
 
         f32.store
 
-        local.get $top
+        local.get $i2
         i32.const 4
         i32.add
-        local.set $top
+        local.set $i2
         
         local.get $i
         i32.const 16
@@ -51,6 +52,11 @@
       i32.const 4
       i32.add
       local.tee $j
+	  
+	  local.get $j2
+	  i32.const 16
+	  i32.add
+	  local.set $j2
 
       i32.const 16
       i32.lt_u
@@ -242,7 +248,7 @@
     v128.store
 
     local.get $to
-    i32.const 16
+    i32.const 32
     i32.add
 
     i32.const 32
@@ -251,7 +257,7 @@
     v128.store
 
     local.get $to
-    i32.const 16
+    i32.const 48
     i32.add
 	
 	i32.const 48
@@ -297,7 +303,7 @@
 
     local.get $from
     i32.const 0
-    call $matMull
+    call $matMul
   )
    
   (func (export "scalar") (param $from i32) (param $scalar f32)
@@ -342,70 +348,57 @@
    (param $sina f32)
    (param $cosa f32)
 
-   local.get $from
+   i32.const 0
    local.get $cosa	 
    f32.store
 
-   local.get $from
    i32.const 4
-   i32.add
    local.get $sina
    f32.const -1
    f32.mul
    f32.store
 
-   local.get $from
    i32.const 8
-   i32.add
    f32.const 0
    f32.store
 
-   local.get $from
+
    i32.const 12
-   i32.add
    f32.const 0
    f32.store
 
-   local.get $from
    i32.const 16
-   i32.add
    local.get $sina	 
    f32.store
 
-   local.get $from
+
    i32.const 20
-   i32.add
    local.get $cosa
    f32.store
 
-   local.get $from
+
    i32.const 24
-   i32.add
    f32.const 0
    f32.store
 
-   local.get $from
+
    i32.const 28
-   i32.add
    f32.const 0
    f32.store
   
-   local.get $from
    i32.const 32
-   i32.add
    v128.const f32x4 0x0 0x0 0x1 0x0
    v128.store
 
-   local.get $from
+
    i32.const 48
-   i32.add
    v128.const f32x4 0x0 0x0 0x0 0x1
    v128.store
    
    ;; made the rotation matrix
-   local_get $from
+   local.get $from
    i32.const 0
-   call $matMull
+   call $matMul
   )
   
   (func (export "rotx")
@@ -467,7 +460,7 @@
    
     local.get $from
     i32.const 16
-    i32.store
+    i32.add
 	v128.const f32x4 0x0 0x1 0x0 0x0
     v128.store
     
