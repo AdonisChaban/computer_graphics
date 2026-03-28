@@ -406,13 +406,11 @@
    (param $sina f32)
    (param $cosa f32)
    
-    local.get $from
+    i32.const 0
     v128.const f32x4 0x1 0x0 0x0 0x0
     v128.store
    
-    local.get $from
     i32.const 16
-    i32.add
     v128.const f32x4 0x0 0x0 0x0 0x0
     local.get $cosa
     f32x4.replace_lane 1
@@ -422,9 +420,7 @@
     f32x4.replace_lane 2
     v128.store
 
-    local.get $from
     i32.const 32
-    i32.add
     v128.const f32x4 0x0 0x0 0x0 0x0
     local.get $sina
     f32x4.replace_lane 1
@@ -432,9 +428,7 @@
     f32x4.replace_lane 2
     v128.store
 
-    local.get $from
     i32.const 48
-    i32.add
     v128.const f32x4 0x0 0x0 0x0 0x1
     v128.store
 
@@ -450,7 +444,7 @@
    (param $sina f32)
    (param $cosa f32)
    
-    local.get $from
+    i32.const 0
     v128.const f32x4 0x0 0x0 0x0 0x0
     local.get $sina
     f32x4.replace_lane 2
@@ -458,16 +452,12 @@
     f32x4.replace_lane 0
     v128.store
    
-    local.get $from
     i32.const 16
-    i32.add
 	v128.const f32x4 0x0 0x1 0x0 0x0
     v128.store
     
 
-    local.get $from
     i32.const 32
-    i32.add
     v128.const f32x4 0x0 0x0 0x0 0x0
     local.get $sina
 	f32.const -1
@@ -477,9 +467,7 @@
     f32x4.replace_lane 2
     v128.store
 
-    local.get $from
     i32.const 48
-    i32.add
     v128.const f32x4 0x0 0x0 0x0 0x1
     v128.store
 
@@ -487,6 +475,60 @@
 	i32.const 0
 	local.get $from
 	call $matMul 
+  )
+
+  (func (export "projection") (param $from i32)
+    (param $f f32)
+	(param $ascept f32)
+	(param $near f32)
+	(param $far f32)
+	
+	i32.const 0
+    v128.const f32x4 0x0 0x0 0x0 0x0
+    local.get $f
+	local.get $ascept
+	f32.div
+    f32x4.replace_lane 0
+    v128.store
+   
+    i32.const 16
+	v128.const f32x4 0x0 0x0 0x0 0x0
+	local.get $f
+	f32x4.replace_lane 1
+    v128.store
+    
+
+    i32.const 32
+    v128.const f32x4 0x0 0x0 0x0 0x0
+    local.get $far
+	local.get $near
+	f32.add
+	local.get $near
+	local.get $far
+	f32.sub
+	f32.div
+	f32x4.replace_lane 2
+	f32.const 2
+	local.get $far
+	local.get $near
+	f32.mul
+	f32.mul
+	local.get $near
+	local.get $far
+	f32.sub
+	f32.div
+	f32x4.replace_lane 3
+    v128.store
+
+    i32.const 48
+    v128.const f32x4 0x0 0x0 -1 0x0
+    v128.store
+
+    ;; we have our matrix
+	i32.const 0
+	local.get $from
+	call $matMul 
+  
   )  
   
 )  

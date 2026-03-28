@@ -64,6 +64,7 @@ class Matrix4f
 			Matrix4f.#Roty = wasmFuncs.roty;
 			Matrix4f.#Rotx = wasmFuncs.rotx;
 			Matrix4f.#scalar = wasmFuncs.scalar;
+			Matrix4f.#proj = wasmFuncs.projection;
 		} catch (e) {			
 			throw new Error(e);
 		}	
@@ -107,8 +108,7 @@ class Matrix4f
 		for(let i = 0; i < 64; i+=4)
 		{
 			const value  = data.getFloat32(i,true);
-			// for debugging
-			console.log(value);
+			// console.log(value); 			// for debugging
 			this.#elements[i] = value;			
 		}
 		
@@ -162,6 +162,15 @@ class Matrix4f
 	scalar(alpha)
 	{
 		Matrix4f.#scalar(this.#location_in_memory, alpha);
+	}
+	
+	projection(fovy, ascept, near, far)
+	{
+		fovy *= 0.5;
+		const f = Math.cos(fovy)/Math.sin(fovy);
+		
+		Matrix4f.#proj(this.#location_in_memory, f, ascept, near, far);
+		
 	}
 
 }
