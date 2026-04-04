@@ -433,8 +433,8 @@
     v128.store
 
     ;; we have our matrix
-	i32.const 0
 	local.get $from
+	i32.const 0
 	call $matMul  
   )
   
@@ -472,8 +472,8 @@
     v128.store
 
     ;; we have our matrix
-	i32.const 0
 	local.get $from
+	i32.const 0
 	call $matMul 
   )
 
@@ -525,8 +525,8 @@
     v128.store
 
     ;; we have our matrix
-	i32.const 0
 	local.get $from
+	i32.const 0
 	call $matMul 
   
   )  

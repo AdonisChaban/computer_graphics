@@ -13,80 +13,102 @@ try
 }
 
 const vertexShaderSource = 
-"attribute vec4 position; \n" +
-"uniform mat4 uMatrix;\n"
-"void main(){\n" +
-" gl_Position = uMatrix * position;\n" +
-"}\n";
+`#version 300 es
+in vec3 position;
+in  vec2 a_texcoord;
 
-const fragmentShaderSource = 
-"void main(){\n" +
-"gl_Fragcolor = vec4(1.0,1.0,1.0,1.0);\n" +
-"}\n";
+out vec2 v_texcoord;
+uniform mat4 uMatrix;
+
+void main(void){ 
+ gl_Position = uMatrix * vec4(position, 1.0);
+ v_texcoord = a_texcoord; 
+}`;
+
+const fragmentShaderSource =
+`#version 300 es
+precision highp float;
+in  vec2 v_texcoord;
+
+uniform sampler2D u_sampler;
+out vec4 colour;
+
+void main(void){
+	colour = texture(u_sampler, v_texcoord);
+}`;
 
 
 const canvas = document.getElementById('webgl');
 
-const gl = canvas.getContext("webgl");
+const gl = canvas.getContext("webgl2");
 if(!gl)
 {
 	throw new Error("Couldn't load the context");	
 }
 
-gl.clearColor(0.0, 0.0, 0.0, 1.0);
-gl.clear(gl.COLOR_BUFFER_BIT);
-
-
 const shader_program = createShaderProgram(gl, createShader(gl, vertexShaderSource, gl.VERTEX_SHADER), createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER));
 
-// store all the info we'll ever need
-const program_info = {
-	program: shader_program,
-	attib_locations: {
-		vertex_position: gl.getAttribLocation(shader_program, "position"),
-	},
-	uniformLocations: {
-		uMatrix: gl.getUniformLocation(shader_program, "uMatrix");		
-	}	
-};
+let u_matrix = new Matrix4f();
+//const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+//const fov = (45 * Math.PI) / 180; 
+// u_matrix.projection(fov, aspect, 1, 5);
 
-const buffers = initBuffers(gl);
+//gl.enable(gl.CULL_FACE);
 
-drawScene(gl, program_info, buffers);
+const vpos = gl.getAttribLocation(shader_program, "position");
+const tpos = gl.getAttribLocation(shader_program, "a_texcoord");
+const sampler = gl.getUniformLocation(shader_program, 'u_sampler');	
+
+const buffers = initBuffers(gl, vpos, tpos, sampler);
+const loc_uMatrix = gl.getUniformLocation(shader_program, "uMatrix");
+let start;
+
+requestAnimationFrame(render);
 
 
+// drawScene(gl, shader_program, buffers, u_matrix, loc_uMatrix);
 
-function drawScene(gl, program_info, buffers)
+
+function drawScene()
 {
-	gl.clearColor(0.0, 0.0, 0.0, 1.0);
-	gl.clearDepth(1.0);
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LEQUAL);
+	gl.clearColor(1.0, 1.0, 1.0, 1.0);	// background
+	gl.clear(gl.COLOR_BUFFER_BIT);
+	gl.viewport(0,0,gl.canvas.width,gl.canvas.height);
+	// gl.enable(gl.CULL_FACE);
+	// gl.useProgram(shader_program);	
 	
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	
-	let u_matrix = new Matrix4f();
-	const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-	const fov = (45 * Math.PI) / 180; // 45 degrees in randians
-	u_matrix.projection(fov, ascept, 0.1, 100.0);
-	
+	if(buffers.tex)
+	{
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, buffers.tex);
+		gl.uniform1i(sampler,0);	
+	}
 	
 	//setPositionAttribute
 	gl.bindVertexArray(buffers.vao);
-	
-	gl.useProgram(program_info.program);
-	
-	gl.uniformMatrix4fv(
-	  program_info.uniformLocations.uMatrix,
-	  false,
-	  u_matrix.getData()
-	  
-	  gl.drawElements(gl.TRIANGLES, buffers.count, gl.UNSIGNED_SHORT, 0);
-	);
-	
-	
+	// gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.ibo);	
+	gl.drawElements(gl.TRIANGLES, buffers.count, gl.UNSIGNED_SHORT, 0);		
 }
 
 
-
-
+function render(time)
+{
+	if (start === undefined)
+	{
+		start = time;
+	}
+	
+	const elapsed = 0.001 * (time - start); // convert to seconds
+	
+	//start = time;
+	
+	u_matrix.rotY(elapsed);
+	// console.log(u_matrix.getData());
+	gl.useProgram(shader_program);
+	
+	gl.uniformMatrix4fv(loc_uMatrix, false, u_matrix.getData());
+	
+	drawScene();
+	
+	requestAnimationFrame(render);	
+}

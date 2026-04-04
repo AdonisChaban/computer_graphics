@@ -38,6 +38,8 @@ class Matrix4f
 	 static #moveTo;
 	 
 	 static #scalar;
+	 
+	 static #proj;
 	
 
      /* --------------------------------------------------------*/
@@ -102,14 +104,14 @@ class Matrix4f
 	// try to use this minimally
 	getData()
 	{
-		console.log(Matrix4f.#memory);
+		//console.log(Matrix4f.#memory);
 		const data = new DataView(Matrix4f.#memory.buffer, this.#location_in_memory, 64);
 		
 		for(let i = 0; i < 64; i+=4)
 		{
 			const value  = data.getFloat32(i,true);
-			// console.log(value); 			// for debugging
-			this.#elements[i] = value;			
+			 //console.log(value); 			// for debugging
+			this.#elements[i/4] = value;			
 		}
 		
 		return this.#elements; 
@@ -169,7 +171,7 @@ class Matrix4f
 		fovy *= 0.5;
 		const f = Math.cos(fovy)/Math.sin(fovy);
 		
-		Matrix4f.#proj(this.#location_in_memory, f, ascept, near, far);
+		Matrix4f.#proj(this.#location_in_memory, 1, ascept, near, far);
 		
 	}
 
