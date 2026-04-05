@@ -9,11 +9,11 @@ function initBuffers(gl, vpos, tpos, sampler)
 	]); */
 	
 	const vertices = new Float32Array([      
- 		-0.5,-0.5,-0.5,
-		0.5, -0.5,-0.5,
-		0.5,-0.5,0.5,
-		-0.5, -0.5, 0.5,
-		0.0, 0.5, 0.0      
+ 		-0.5,-0.5,-0.5,//0
+		0.5, -0.5,-0.5,//1
+		0.5,-0.5,0.5,//2
+		-0.5, -0.5, 0.5,//3
+		0.0, 0.5, 0.0//4     
 	]);
 	
 	
@@ -22,8 +22,8 @@ function initBuffers(gl, vpos, tpos, sampler)
 		//0,2,3, // base
 		1,4,0, // front face
 		2,4,1, // right face
-		2,4,3, // back face
-		0,4,3 // left face
+		3,4,2, // back face
+		3,0,4 // left face
 	]);
 	
 	const tex_coords = new Float32Array([

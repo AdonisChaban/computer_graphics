@@ -53,7 +53,7 @@ let u_matrix = new Matrix4f();
 //const fov = (45 * Math.PI) / 180; 
 // u_matrix.projection(fov, aspect, 1, 5);
 
-//gl.enable(gl.CULL_FACE);
+gl.enable(gl.CULL_FACE);
 
 const vpos = gl.getAttribLocation(shader_program, "position");
 const tpos = gl.getAttribLocation(shader_program, "a_texcoord");
