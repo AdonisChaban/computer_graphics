@@ -93,56 +93,56 @@
     local.set $wall2
    
     (loop $outer_loop
-      v128.const f32x4 0x0 0x0 0x0 0x0
-
+	  v128.const f32x4 0x0 0x0 0x0 0x0
+	  
     	  (loop $inner_loop (param v128) (result v128)
 
-            local.get $matp1
+		local.get $matp1
 	        v128.load
-            
-		    local.get $matp2
-		    v128.load
+		
+		local.get $matp2
+		v128.load
 
-		   ;; SIMD multi our two vectors
-		   f32x4.mul
-		   local.set $res
-		   v128.const i32x4 0x3  0x0  0x1 0x2
-           local.get $res
-		   i8x16.swizzle
-		   local.get $res
-		   f32x4.add
-           local.set $res
-		   v128.const i32x4 0x2 0x3 0x0 0x1
-           local.get $res
-		   i8x16.swizzle;; each element in this vector is the same
-           local.set $res
-           v128.const i32x4 0x0 0x10 0x10 0x10
-           local.get $res
-           i8x16.swizzle ;;[dp, 0 ,0,0]
+		;; SIMD multi our two vectors
+		f32x4.mul
+		local.set $res
+		v128.const i32x4 0x3  0x0  0x1 0x2
+		local.get $res
+		i8x16.swizzle
+		local.get $res
+		f32x4.add
+		local.set $res
+		v128.const i32x4 0x2 0x3 0x0 0x1
+		local.get $res
+		i8x16.swizzle;; each element in this vector is the same
+		local.set $res
+		v128.const i32x4 0x0 0x10 0x10 0x10
+		local.get $res
+		i8x16.swizzle ;;[dp, 0 ,0,0]
 
-           f32x4.add
-           local.set $res
-           v128.const i32x4 0x3 0x0 0x1 0x2
-           local.get $res
-           i8x16.swizzle ;; swifting to the right by one for the final result
+		f32x4.add
+		local.set $res
+		v128.const i32x4 0x3 0x0 0x1 0x2
+		local.get $res
+		i8x16.swizzle ;; swifting to the right by one for the final result
                         
-		   ;; iteration, add matp2 by 16  
-		   i32.const 16
-		   local.get $matp2
-		   i32.add
-		   local.set $matp2
+		;; iteration, add matp2 by 16  
+		i32.const 16
+		local.get $matp2
+		i32.add
+		local.set $matp2
 
-		   ;; check our iteration
-		   local.get $matp2
-		   local.get $wall1
-		   i32.lt_u
-		   br_if $inner_loop		
+		;; check our iteration
+		local.get $matp2
+		local.get $wall1
+		i32.lt_u
+		br_if $inner_loop		
 	     )
-
+	  
 	  ;; let's store into memory
-      local.set $res
+	  local.set $res
 	  local.get $matp1
-      local.get $res
+	  local.get $res
 	  v128.store
 
 	  i32.const 16
@@ -222,10 +222,10 @@
     v128.const f32x4 0x0 0x0 0x0 0x1
     v128.store
 	
-	;; multiply that shit
-	i32.const 0
-	local.get $offset
-	call $matMul
+    ;; multiply that shit
+    i32.const 0
+    local.get $offset
+    call $matMul
 
   ) ;; end of transpose function
   
