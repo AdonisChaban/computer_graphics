@@ -1,3 +1,4 @@
+
 class ShaderProgram{
     // constructor from strach
     constructor(gl, vsource, fsource){
@@ -35,6 +36,11 @@ class ShaderProgram{
 	
     }
 
+    get()
+    {
+	return this.program;
+    }
+
     use()
     {
 	this.gl.useProgram(this.program);
@@ -42,3 +48,5 @@ class ShaderProgram{
 
     
 }
+
+export {ShaderProgram};
