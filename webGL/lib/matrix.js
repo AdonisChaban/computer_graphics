@@ -1,17 +1,14 @@
-import {Vec3} from "./vec.js"
+import {Vec3} from "./vec.js";
 
 // Matrix 4x4 Library
 class Matrix4f
 {
     #location_in_memory;
     #is_colunm_major;
-    #elements;
     
 	
-    static #memory; 
     static #buffer_manager = 64; // index 0 is reserved
     static #memory_viewer; // will have acess to the first index matrix
-    static #ptr_to_memory;
     static #instance; 
 	
     /* ------------Function from fastmat4.wasm -----------*/
@@ -59,14 +56,12 @@ class Matrix4f
     */
     static async bootUp() {
 	try{
-	    const obj = await WebAssembly.instantiateStreaming(fetch("fastmat4.wasm"));
+	    const obj = await WebAssembly.instantiateStreaming(fetch("../fastmat4.wasm"));
 	    console.log(obj);
 	    Matrix4f.#instance = obj.instance.exports;
 	    const wasmFuncs = obj.instance.exports;
-	    Matrix4f.#ptr_to_memory = wasmFuncs.allocateF32Array(16);
-	    Matrix4f.#memory_viewer = new Float32Array(wasmFuncs.memory.buffer, ptr, 16);
 	    Matrix4f.Mul = wasmFuncs.matMul;
-	    Matrix4f.#memory = wasmFuncs.memory;
+	    Matrix4f.#memory_viewer = new Float32Array(wasmFuncs.memory);
 	    Matrix4f.Iden = wasmFuncs.matIden;
 	    Matrix4f.#Transpose = wasmFuncs.transposeMatrix;
 	    Matrix4f.#moveTo = wasmFuncs.moveTo;
@@ -104,28 +99,17 @@ class Matrix4f
 	
 	// creates the Identity Matrix (colunm row)
 	Matrix4f.Iden(this.#location_in_memory);
-	this.is_colunm_major = true; // also row major, symmetric matrix
-	this.#elements = new Float32Array(16); 
+	this.is_colunm_major = true; // also row major, symmetric matrix 
 			
     }
 	
     // try to use this minimally
-    // there is perhaps a faster way of doing this;
-    // will change when this library is in greater use.
-    // https://github.com/WebAssembly/design/issues/1231 for assitence
+    // returns matrix data to store in Float32Array(16)
     getData()
     {
-	//console.log(Matrix4f.#memory);
-	const data = new DataView(Matrix4f.#memory.buffer, this.#location_in_memory, 64);
-	
-	for(let i = 0; i < 64; i+=4)
-	{
-	    const value  = data.getFloat32(i,true);
-	    //console.log(value); 			// for debugging
-	    this.#elements[i/4] = value;			
-	}
-		
-	return this.#elements; 
+	const mem_loc = this.#location_in_memory / 4; // convert byte location to float index
+	return Matrix4f.#memory_viewer.slice(mem_loc, mem_loc + 16);
+	 
     }
 	
     isColunmMajor()
@@ -184,6 +168,7 @@ class Matrix4f
     }
 
     // will construct a translation matrix
+    // empty for now
     translate(x,y,z)
     {
 
@@ -214,7 +199,6 @@ class Matrix4f
 	    0, 0, 0, 1]);
 
 	Matrix4f.#memory_viewer = data;
-	Matrix4f.#instance.processF32Array(Matrix4f.ptr_to_memory, 16);
 	Matrix4f.Mul(0, this.#location_in_memory);
     }
 }

@@ -1,6 +1,5 @@
 /*
-  simple vector, potentially will use
-  webassembly, but I'll keep this simple.
+  simple vector class
 */
 
 class Vec3{
@@ -62,4 +61,4 @@ class Vec4{
     }
 }
 
-export {Vec4};
+export {Vec4, Vec3};

@@ -1,11 +1,11 @@
 
-class ShaderProgram{
-    // constructor from strach
+class ShaderProgram{    
     constructor(gl, vsource, fsource){
-	// time to construct the program
+	// shader attributes directly below
 	this.gl = gl;
 	this.vshader = gl.createShader(gl.VERTEX_SHADER);
 	this.fshader = gl.createShader(gl.FRAGMENT_SHADER);
+	this.attributes = new Object();
 	gl.shaderSource(this.vshader, vsource);
 	gl.compileShader(this.vshader);
 
@@ -40,12 +40,17 @@ class ShaderProgram{
     {
 	return this.program;
     }
+    
+    // throws an exception on error
+    setAttribute(attribute_name)
+    {
+	this.attributes[attribute_name] = this.gl.getAttribLocation(this.program, attribute_name);	
+    }
 
     use()
     {
 	this.gl.useProgram(this.program);
     }
-
     
 }
 
