@@ -1,6 +1,7 @@
 import {Matrix4f} from "../../lib/matrix.js";
 import {ShaderProgram} from "../../lib/shader.js";
 import {Camera} from "../../lib/camera.js";
+import {Vec3} from "../../lib/vec.js";
 
 try
 {
@@ -15,9 +16,10 @@ const vshader =
 in vec4 a_position;
 in vec3 a_colour;
 out vec3 attr_colour;
+uniform mat4 view;
 
 void main(){
- gl_Position = a_position;
+ gl_Position =  view * a_position;
  attr_colour = a_colour;
 }
 `;
@@ -46,13 +48,17 @@ if(!gl){
 // set the shader program here3
 
 
-let u_matrix = new Matrix4f();
+let view_matrix = new Matrix4f();
 const cube_shader = new ShaderProgram(gl, vshader, fshader);
+
+
 
 
 // set attributes here
 cube_shader.setAttribute("a_position");
 cube_shader.setAttribute("a_colour");
+
+
 
 // effienct? No! but good proof of concept
 const vertices = [
@@ -125,11 +131,25 @@ gl.enableVertexAttribArray(u2);
 offset = 12;
 gl.vertexAttribPointer(u2, size, type, normalize, stride, offset);
 
+let yaw = -90.0;
+let pitch = 0.0;
+let then = 0.0;
+const sensitivity = 0.001;
 
-let then = 0;
+canvas.addEventListener("mousemove", (e) => {
+    
+    
+    yaw += e.offsetX * sensitivity;
+    pitch += e.offsetY * sensitivity;
 
-requestAnimationFrame(drawScene);
+    console.log(yaw);
+    console.log(pitch);
+    
+    if(pitch > 89.0) pitch = 89.0;
+    if(pitch < -89.0) pitch = -89.0;
+});
 
+requestAnimationFrame(render);
 
 
 
@@ -151,13 +171,32 @@ function drawScene()
     gl.clearColor(0,0,0,0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    view_matrix.setIden();
+    let dir = new Vec3(0,0,0);
+    const up = new Vec3(0,1,0);
+    const eye = new Vec3(0,0,0);
+    dir.x = Math.cos(yaw * Math.PI / 180) * Math.cos(pitch * Math.PI / 180);
+    dir.y = Math.sin(pitch * Math.PI / 180);
+    dir.z = Math.sin(yaw * Math.PI / 180) * Math.cos(pitch * Math.PI / 180); 
+    dir.normalize();
+
+    //console.log(dir);
+    
+    view_matrix.lookAt(eye,dir,up);
+
+    
     cube_shader.use();
+    cube_shader.setUniforms(view_matrix.elements); // pass in Float32Array
     gl.bindVertexArray(vao);
 
+    //console.log(view_matrix.elements);
 
     const offset = 0;
     const count = 36;
     gl.drawArrays(gl.TRIANGLES, offset, count);
    
 }
+
+
+
 

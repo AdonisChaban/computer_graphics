@@ -61,7 +61,7 @@ class Matrix4f
 	    Matrix4f.#instance = obj.instance.exports;
 	    const wasmFuncs = obj.instance.exports;
 	    Matrix4f.Mul = wasmFuncs.matMul;
-	    Matrix4f.#memory_viewer = new Float32Array(wasmFuncs.memory);
+	    Matrix4f.#memory_viewer = wasmFuncs.memory.buffer;
 	    Matrix4f.Iden = wasmFuncs.matIden;
 	    Matrix4f.#Transpose = wasmFuncs.transposeMatrix;
 	    Matrix4f.#moveTo = wasmFuncs.moveTo;
@@ -81,6 +81,7 @@ class Matrix4f
 	// for example, the rotation matrix will be in the
 	// index 0 for the operation rotx. 
 	this.#location_in_memory = Matrix4f.#buffer_manager;
+	this.elements = new Float32Array(16);
 	
 	Matrix4f.#buffer_manager += 64; 
 	
@@ -107,9 +108,17 @@ class Matrix4f
     // returns matrix data to store in Float32Array(16)
     getData()
     {
-	const mem_loc = this.#location_in_memory / 4; // convert byte location to float index
-	return Matrix4f.#memory_viewer.slice(mem_loc, mem_loc + 16);
-	 
+	
+	const data = new DataView(Matrix4f.#memory_viewer, this.#location_in_memory, 64);
+	
+	for(let i = 0; i < 64; i+=4)
+	{
+	    const value  = data.getFloat32(i,true);
+	    //console.log(value); 			// for debugging
+	    this.elements[i/4] = value;			
+	}
+		
+	return this.elements; 
     }
 	
     isColunmMajor()
@@ -174,16 +183,13 @@ class Matrix4f
 
     }
 
-    // do note that eye, at, and up are of type Vec3
-    lookAt(eye, at, up)
+    // do note that forward and up are of type Vec3
+    // let both vectors be normalized, eye is the translation of the camera
+    // this is so fucked
+    lookAt(eye, forward, up)
     {
-	let forward = Vec3(0, 0, 0);
-	
-	forward.minus(eye, at);
-	forward.normalize();
-	
+		
 	let left = forward.cross(up);
-	left.normalize();
 	
 	let real_up = forward.cross(left);
 
@@ -192,14 +198,25 @@ class Matrix4f
 	const transy = -1 * real_up.dot(eye);
 	const transz = -1 * forward.dot(eye);
 
-	const data = new Float32Array([
+	this.elements = new Float32Array([
 	    left.x, left.y, left.z, transx,
 	    real_up.x, real_up.y, real_up.z, transy,
 	    forward.x, forward.y, forward.z , transz,
 	    0, 0, 0, 1]);
 
-	Matrix4f.#memory_viewer = data;
+	const wasm_setter = new DataView(Matrix4f.#memory_viewer, 0, 64);
+	
+	this.elements.forEach((val, i) => {
+	    wasm_setter.setFloat32(i * 4, val);
+	   // console.log(val);
+	});
+	
 	Matrix4f.Mul(0, this.#location_in_memory);
+    }
+
+    setIden()
+    {
+	Matrix4f.Iden(this.#location_in_memory);
     }
 }
 

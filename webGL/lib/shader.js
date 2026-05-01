@@ -47,6 +47,17 @@ class ShaderProgram{
 	this.attributes[attribute_name] = this.gl.getAttribLocation(this.program, attribute_name);	
     }
 
+    // pass in data for the uniform
+    // we'll need to be smart as
+    // we have to figure out what version
+    // of gl.uniform* to use
+    // this method does need improvement, right now it's just hard coded
+    setUniforms(data)
+    {
+	const uniform_location =  this.gl.getUniformLocation(this.program, "view");
+	this.gl.uniformMatrix4fv(uniform_location, false, data);
+    }
+
     use()
     {
 	this.gl.useProgram(this.program);
