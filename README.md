@@ -7,4 +7,5 @@ if you want to see the webGL projects, use the following command to make a webse
 
 # Project Details
 project 1: Obamium but Dennis Meadows
-ptoject 2: SkyBox with no textures
+
+project 2: SkyBox with no textures
