@@ -190,8 +190,9 @@ class Matrix4f
     {
 		
 	let left = forward.cross(up);
-	
+	left.normalize();
 	let real_up = forward.cross(left);
+	real_up.normalize();
 
 	
 	const transx = -1 * left.dot(eye);

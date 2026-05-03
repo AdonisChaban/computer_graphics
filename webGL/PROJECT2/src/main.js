@@ -63,47 +63,47 @@ cube_shader.setAttribute("a_colour");
 // effienct? No! but good proof of concept
 const vertices = [
     // pos      // colour
-    -1,-1,1,    1,0,0, //red 
-    1,-1,1,     1,0,0,
-    1,1,1,      1,0,0,
-    1,1,1,      1,0,0,
-    -1,1,1,     1,0,0,
-    -1,-1,1,    1,0,0,
+    -1, 1, 1,     1,0,0, //red 
+    1, 1, 1,    1,0,0,
+    -1, -1, 1,    1,0,0,
+    -1, -1, 1,    1,0,0,
+    1, 1, 1,    1,0,0,
+    1, -1, 1,    1,0,0,
     // end of front square
-    -1,-1,-1,   0,0,1,// blue
-    1,-1,-1,    0,0,1, 
-    1,1,-1,     0,0,1,
-    1,1,-1,     0,0,1,
-    -1,1,-1,    0,0,1,
-    -1,-1,-1,   0,0,1,
+    1, 1, -1,   0,0,1,// blue
+    -1, 1, -1,   0,0,1, 
+    -1, -1, -1,   0,0,1,
+    -1, -1, -1,   0,0,1,
+    1, -1, -1,   0,0,1,
+    1, 1, -1,   0,0,1,
     // end of back
-    1,-1,1,     0,1,0, // green
-    1,-1,-1,    0,1,0,
-    1,1,-1,     0,1,0,
-    1,1,-1,     0,1,0,
-    1,1,1,      0,1,0,
-    1,-1,1,     0,1,0,
+    -1, -1, -1,     0,1,0, // green
+    -1, 1, -1,    0,1,0,
+    -1, 1, 1,      0,1,0,
+    -1, 1, 1,      0,1,0,
+    -1, -1, 1,     0,1,0,
+    -1, -1, -1,     0,1,0,
     // end of right
-    -1,-1,1,    1,1,0, // yellow
-    -1,-1,-1,   1,1,0,
-    -1,1,-1,    1,1,0,
-    -1,1,-1,    1,1,0,
-    -1,1,1,     1,1,0,
-    -1,-1,1,    1,1,0,
+    1, 1, 1,   1,1,0, // yellow
+    1, 1, -1,   1,1,0,
+    1, -1, -1,   1,1,0,
+    1, -1, -1,   1,1,0,
+    1, -1, 1,   1,1,0,
+    1, 1, 1,   1,1,0,
     // end of left
-    -1,1,1,     1,0,1, // pink
-    1,1,1,      1,0,1,
-    1,1,-1,     1,0,1,
-    1,1,-1,     1,0,1,
-    -1,1,-1,    1,0,1,
-    -1,1,1,     1,0,1,
+    -1, 1, 1,     1,0,1, // pink
+    -1, 1, -1,    1,0,1,
+    1, 1, -1,    1,0,1,
+    1, 1, -1,    1,0,1,
+    -1, 1, -1,    1,0,1,
+    1, 1, 1,    1,0,1,
     //end of top
-    -1,-1,1,    0,1,1, // cyan
-    1,-1,1,     0,1,1,
-    1,-1,-1,    0,1,1,
-    1,-1,-1,    0,1,1,
-    -1,-1,-1,   0,1,1,
-    -1,-1,1,    0,1,1
+    -1, -1, 1,   0,1,1, // cyan
+    1, -1, 1,   0,1,1,
+    1, -1, -1,   0,1,1,
+    1, -1, -1,   0,1,1,
+    -1, -1, -1,   0,1,1,
+    1, -1, 1,   0,1,1
     // end of bottom
 ];
 
@@ -134,19 +134,19 @@ gl.vertexAttribPointer(u2, size, type, normalize, stride, offset);
 let yaw = -90.0;
 let pitch = 0.0;
 let then = 0.0;
-const sensitivity = 0.001;
+const sensitivity = 0.1;
 
-canvas.addEventListener("mousemove", (e) => {
-    
-    
-    yaw += e.offsetX * sensitivity;
-    pitch += e.offsetY * sensitivity;
+canvas.addEventListener("mousemove", (e) => {    
+    yaw += e.movementX * sensitivity;
+    //  pitch += e.offsetY * sensitivity;
+
+    console.log("here");
 
     console.log(yaw);
     console.log(pitch);
     
-    if(pitch > 89.0) pitch = 89.0;
-    if(pitch < -89.0) pitch = -89.0;
+    if(yaw > 360) yaw -= 360;
+    if(yaw < 0) yaw += 360;
 });
 
 requestAnimationFrame(render);

@@ -55,7 +55,7 @@ class ShaderProgram{
     setUniforms(data)
     {
 	const uniform_location =  this.gl.getUniformLocation(this.program, "view");
-	this.gl.uniformMatrix4fv(uniform_location, false, data);
+	this.gl.uniformMatrix4fv(uniform_location, true, data);
     }
 
     use()
